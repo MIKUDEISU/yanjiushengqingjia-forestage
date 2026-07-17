@@ -5,6 +5,7 @@ import {User, Lock, Postcard} from '@element-plus/icons-vue'
 import {useUserInfoStore} from '@/stores/userInfo'
 import {useRouter} from 'vue-router'
 import {loginService, userInfoService} from '@/api/user'
+import axios from "axios";
 
 const router = useRouter()
 const userInfoStore = useUserInfoStore()
@@ -42,18 +43,15 @@ const handleLogin = async () => {
 
   loading.value = true
   try {
-    // TODO: 替换为实际的登录接口
-    // const res = await loginService(loginForm)
-    // userInfoStore.setUserInfo(res.data)
-    // ElMessage.success('登录成功')
-    // router.push('/user/info')
-
-    // 模拟登录
-    ElMessage.success('登录成功')
-    userInfoStore.setUserInfo({
-      studentId: loginForm.studentId,
-      name: loginForm.name
+    axios.post('http://127.0.0.1:8080/api/user/login', {
+      studentId: handleLogin.studentId,
+      name: handleLogin.name,
+      password: handleLogin.password,
     })
+    // TODO: 替换为实际的登录接口
+    const res = await loginService(loginForm)
+    userInfoStore.setUserInfo(res.data)
+    ElMessage.success('登录成功')
     router.push('/user/info')
   } catch (e) {
     console.error(e)
