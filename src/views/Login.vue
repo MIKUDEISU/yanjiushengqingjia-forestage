@@ -21,15 +21,15 @@ const loginForm = reactive({
 const rules = {
   studentId: [
     {required: true, message: '请输入学号', trigger: 'blur'},
-    {pattern: /^\d{6,12}$/, message: '学号为6-12位数字', trigger: 'blur'}
+    {message: '学号', trigger: 'blur'}
   ],
   name: [
     {required: true, message: '请输入姓名', trigger: 'blur'},
-    {min: 2, max: 10, message: '姓名长度为2-10个字符', trigger: 'blur'}
+    {message: '姓名', trigger: 'blur'}
   ],
   password: [
     {required: true, message: '请输入密码', trigger: 'blur'},
-    {min: 6, max: 16, message: '密码长度为6-16个字符', trigger: 'blur'}
+    {message: '密码', trigger: 'blur'}
   ]
 }
 
@@ -43,18 +43,19 @@ const handleLogin = async () => {
 
   loading.value = true
   try {
-    axios.post('http://127.0.0.1:8080/api/user/login', {
-      studentId: handleLogin.studentId,
-      name: handleLogin.name,
-      password: handleLogin.password,
+    _login({
+      loginName: loginForm.name,
+      password: loginForm.password,
+      studentId: loginForm.studentId,
+    }).then(function (res) {
+      console.info(res)
+      if (res.data.data === null) {
+        ElMessage.warning('用户名或密码错误')
+      }else {
+        ElMessage.success('登录成功')
+        router.push({path:'/user/list'})
+      }
     })
-    // TODO: 替换为实际的登录接口
-    const res = await loginService(loginForm)
-    userInfoStore.setUserInfo(res.data)
-    ElMessage.success('登录成功')
-    router.push('/user/info')
-  } catch (e) {
-    console.error(e)
   } finally {
     loading.value = false
   }
