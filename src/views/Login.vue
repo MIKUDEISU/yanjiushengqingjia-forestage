@@ -53,7 +53,17 @@ const handleLogin = async () => {
         ElMessage.warning('用户名或密码错误')
       }else {
         ElMessage.success('登录成功')
-        router.push({path:'/user/list'})
+        // 根据用户remark字段跳转不同页面
+        // remark为"老师" → 请假审批页，remark为"学生" → 请假申请表
+        const remark = res.data.remark || res.data.data?.remark || ''
+        if (remark === '老师') {
+          router.push({path: '/leave/approval'})
+        } else if (remark === '学生') {
+          router.push({path: '/leave/application'})
+        } else {
+          // 默认跳转到用户管理页
+          router.push({path:'/user/list'})
+        }
       }
     })
   } finally {

@@ -23,6 +23,13 @@ const getUserInfo = ()=>{
       router.push('/login');
     } else {
       userInfoStore.setUserInfo(res.data);
+      // 根据用户remark字段自动跳转到对应页面
+      const remark = res.data.remark || ''
+      if (remark === '老师') {
+        router.push('/leave/approval');
+      } else if (remark === '学生') {
+        router.push('/leave/application');
+      }
     }
   })
 }
