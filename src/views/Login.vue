@@ -4,6 +4,7 @@ import {ElMessage} from 'element-plus'
 import {User, Lock, Postcard} from '@element-plus/icons-vue'
 import {useUserInfoStore} from '@/stores/userInfo'
 import {useRouter} from 'vue-router'
+import {_login} from "@/api/user";
 import {loginService, userInfoService} from '@/api/user'
 import axios from "axios";
 
@@ -49,13 +50,18 @@ const handleLogin = async () => {
       studentId: loginForm.studentId,
     }).then(function (res) {
       console.info(res)
-      if (res.data.data === null) {
+      // 后端返回格式：{ status: true, code: 0, data: { id, loginName, remark, ... } }
+      // 请求拦截器已提取 result.data，所以 res 就是后端返回的完整对象
+      const userData = res.data  // 用户信息对象
+      if (userData === null) {
         ElMessage.warning('用户名或密码错误')
       }else {
+        // 关键：先将用户信息存入 Pinia store，否则路由守卫会因找不到 remark 而重定向回登录页
+        userInfoStore.setUserInfo(userData)
         ElMessage.success('登录成功')
         // 根据用户remark字段跳转不同页面
         // remark为"老师" → 请假审批页，remark为"学生" → 请假申请表
-        const remark = res.data.remark || res.data.data?.remark || ''
+        const remark = userData.remark || ''
         if (remark === '老师') {
           router.push({path: '/leave/approval'})
         } else if (remark === '学生') {

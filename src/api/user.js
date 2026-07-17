@@ -5,3 +5,4 @@ export const loginService = (loginData) => request.post('/api/auth/login', login
 
 // 获取用户信息
 export const userInfoService = () => request.get('/api/auth/userInfo')
+export const _login =(user) => request.post('/api/user/login', user)//登录
