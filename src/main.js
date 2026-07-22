@@ -1,20 +1,14 @@
-import '@/assets/main.scss'
-import 'element-plus/dist/index.css'
-
-import {createApp} from 'vue'
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+import router from './router/index.js'
 import App from './App.vue'
-import ElementPlus from 'element-plus'
-import router from "@/router";
-import {createPinia} from "pinia";
-import {createPersistedState} from "pinia-persistedstate-plugin";
-import locale from 'element-plus/dist/locale/zh-cn'
+
+import Vant from 'vant'
+import 'vant/lib/index.css'
+import './styles/global.css'
 
 const app = createApp(App)
-const pinia = createPinia()
-const persistedState = createPersistedState();
-pinia.use(persistedState)
-
-app.use(pinia)
+app.use(createPinia())
 app.use(router)
-app.use(ElementPlus, {locale})
+app.use(Vant)
 app.mount('#app')

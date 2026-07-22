@@ -1,354 +1,213 @@
+<template>
+  <div class="login-page">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-logo">🎓</div>
+        <h1 class="login-title">研究生请假系统</h1>
+        <p class="login-subtitle">武汉大学</p>
+      </div>
+
+      <van-form @submit="handleLogin" class="login-form">
+        <van-cell-group inset>
+          <van-field
+            v-model="form.username"
+            name="username"
+            label="用户名"
+            placeholder="请输入用户名"
+            :rules="[{ required: true, message: '请输入用户名' }]"
+            left-icon="user-o"
+            clearable
+          />
+          <van-field
+            v-model="form.password"
+            type="password"
+            name="password"
+            label="密码"
+            placeholder="请输入密码"
+            :rules="[{ required: true, message: '请输入密码' }]"
+            left-icon="lock"
+            clearable
+          />
+        </van-cell-group>
+
+        <div style="margin: 16px">
+          <van-button
+            round
+            block
+            type="primary"
+            native-type="submit"
+            :loading="loading"
+            loading-text="登录中..."
+          >
+            登 录
+          </van-button>
+        </div>
+      </van-form>
+
+      <div class="login-tips">
+        <p class="tips-title">🔑 测试账号</p>
+        <div class="tips-grid">
+          <div class="tip-item" v-for="acc in testAccounts" :key="acc.user" @click="quickFill(acc)">
+            <span class="tip-role">{{ acc.role }}</span>
+            <span class="tip-user">{{ acc.user }}</span>
+          </div>
+        </div>
+        <p class="tips-pwd">密码均为: 123456</p>
+      </div>
+    </div>
+  </div>
+</template>
+
 <script setup>
-import {ref, reactive} from 'vue'
-import {ElMessage} from 'element-plus'
-import {User, Lock, Postcard} from '@element-plus/icons-vue'
-import {useUserInfoStore} from '@/stores/userInfo'
-import {useRouter} from 'vue-router'
-import {_login} from "@/api/user";
-import {loginService, userInfoService} from '@/api/user'
-import axios from "axios";
+import { ref, reactive } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth.js'
+import { showToast } from 'vant'
 
 const router = useRouter()
-const userInfoStore = useUserInfoStore()
+const authStore = useAuthStore()
+const loading = ref(false)
 
-// 表单数据
-const loginForm = reactive({
-  studentId: '',
-  name: '',
+const form = reactive({
+  username: '',
   password: ''
 })
 
-// 表单校验规则
-const rules = {
-  studentId: [
-    {required: true, message: '请输入学号', trigger: 'blur'},
-    {message: '学号', trigger: 'blur'}
-  ],
-  name: [
-    {required: true, message: '请输入姓名', trigger: 'blur'},
-    {message: '姓名', trigger: 'blur'}
-  ],
-  password: [
-    {required: true, message: '请输入密码', trigger: 'blur'},
-    {message: '密码', trigger: 'blur'}
-  ]
+const testAccounts = [
+  { role: '学生', user: 'student1' },
+  { role: '导师', user: 'tutor1' },
+  { role: '辅导员', user: 'counselor1' },
+  { role: '院领导', user: 'college_leader1' },
+  { role: '管理员', user: 'admin1' }
+]
+
+function quickFill(acc) {
+  form.username = acc.user
+  form.password = '123456'
 }
 
-const loginFormRef = ref(null)
-const loading = ref(false)
-
-// 登录
-const handleLogin = async () => {
-  const valid = await loginFormRef.value.validate().catch(() => false)
-  if (!valid) return
-
+async function handleLogin() {
   loading.value = true
   try {
-    _login({
-      loginName: loginForm.name,
-      password: loginForm.password,
-      studentId: loginForm.studentId,
-    }).then(function (res) {
-      console.info(res)
-      // 后端返回格式：{ status: true, code: 0, data: { id, loginName, remark, ... } }
-      // 请求拦截器已提取 result.data，所以 res 就是后端返回的完整对象
-      const userData = res.data  // 用户信息对象
-      if (userData === null) {
-        ElMessage.warning('用户名或密码错误')
-      }else {
-        // 关键：先将用户信息存入 Pinia store，否则路由守卫会因找不到 remark 而重定向回登录页
-        userInfoStore.setUserInfo(userData)
-        ElMessage.success('登录成功')
-        // 根据用户remark字段跳转不同页面
-        // remark为"老师" → 请假审批页，remark为"学生" → 请假申请表
-        const remark = userData.remark || ''
-        if (remark === '老师') {
-          router.push({path: '/leave/approval'})
-        } else if (remark === '学生') {
-          router.push({path: '/leave/application'})
-        } else {
-          // 默认跳转到用户管理页
-          router.push({path:'/user/list'})
-        }
-      }
-    })
+    const result = await authStore.login(form.username, form.password)
+    if (result.success) {
+      showToast({ message: '登录成功', icon: 'success', duration: 1000 })
+      setTimeout(() => {
+        router.push('/')
+      }, 500)
+    } else {
+      showToast({ message: result.message || '登录失败', icon: 'fail' })
+    }
+  } catch (err) {
+    showToast({ message: err.message || '登录失败', icon: 'fail' })
   } finally {
     loading.value = false
   }
 }
 </script>
 
-<template>
-  <div class="login-container">
-    <!-- 背景装饰 -->
-    <div class="bg-decoration">
-      <div class="circle circle-1"></div>
-      <div class="circle circle-2"></div>
-      <div class="circle circle-3"></div>
-    </div>
-
-    <!-- 登录卡片 -->
-    <div class="login-card">
-      <!-- 标题区域 -->
-      <div class="login-header">
-        <div class="logo-icon">
-          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M24 4L6 14v20l18 10 18-10V14L24 4z" stroke="currentColor" stroke-width="2" fill="none"/>
-            <path d="M24 8l-12 7v14l12 7 12-7V15L24 8z" fill="currentColor" opacity="0.15"/>
-            <path d="M18 20h12M18 25h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <h1 class="title">研究生请假系统</h1>
-        <p class="subtitle">Graduate Leave Management System</p>
-      </div>
-
-      <!-- 表单区域 -->
-      <el-form
-          ref="loginFormRef"
-          :model="loginForm"
-          :rules="rules"
-          size="large"
-          class="login-form"
-          @keyup.enter="handleLogin"
-      >
-        <el-form-item prop="studentId">
-          <el-input
-              v-model="loginForm.studentId"
-              placeholder="请输入学号"
-              :prefix-icon="Postcard"
-              clearable
-          />
-        </el-form-item>
-
-        <el-form-item prop="name">
-          <el-input
-              v-model="loginForm.name"
-              placeholder="请输入姓名"
-              :prefix-icon="User"
-              clearable
-          />
-        </el-form-item>
-
-        <el-form-item prop="password">
-          <el-input
-              v-model="loginForm.password"
-              type="password"
-              placeholder="请输入密码"
-              :prefix-icon="Lock"
-              show-password
-          />
-        </el-form-item>
-
-        <el-form-item>
-          <el-button
-              type="primary"
-              class="login-btn"
-              :loading="loading"
-              @click="handleLogin"
-          >
-            {{ loading ? '登录中...' : '登 录' }}
-          </el-button>
-        </el-form-item>
-      </el-form>
-
-      <!-- 底部信息 -->
-      <div class="login-footer">
-        <span>© 2026 研究生请假管理系统</span>
-      </div>
-    </div>
-  </div>
-</template>
-
-<style lang="scss" scoped>
-.login-container {
+<style scoped>
+.login-page {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  position: relative;
-  overflow: hidden;
+  padding: 20px;
 }
 
-/* 背景装饰圆 */
-.bg-decoration {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-}
-
-.circle {
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.circle-1 {
-  width: 400px;
-  height: 400px;
-  top: -100px;
-  right: -80px;
-  animation: float 8s ease-in-out infinite;
-}
-
-.circle-2 {
-  width: 300px;
-  height: 300px;
-  bottom: -60px;
-  left: -60px;
-  animation: float 6s ease-in-out infinite reverse;
-}
-
-.circle-3 {
-  width: 200px;
-  height: 200px;
-  top: 50%;
-  left: 10%;
-  animation: float 10s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-20px) scale(1.05); }
-}
-
-/* 登录卡片 */
 .login-card {
-  width: 420px;
-  padding: 48px 40px 36px;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 20px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15),
-              0 1px 3px rgba(0, 0, 0, 0.08);
-  backdrop-filter: blur(20px);
-  position: relative;
-  z-index: 1;
-  animation: slideUp 0.6s ease-out;
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
 }
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* 标题区域 */
 .login-header {
   text-align: center;
-  margin-bottom: 36px;
-
-  .logo-icon {
-    width: 56px;
-    height: 56px;
-    margin: 0 auto 16px;
-    color: #667eea;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    svg {
-      width: 100%;
-      height: 100%;
-    }
-  }
-
-  .title {
-    font-size: 26px;
-    font-weight: 700;
-    color: #1a1a2e;
-    margin: 0 0 6px;
-    letter-spacing: 2px;
-  }
-
-  .subtitle {
-    font-size: 12px;
-    color: #9ca3af;
-    margin: 0;
-    letter-spacing: 1px;
-  }
+  padding: 40px 32px 24px;
 }
 
-/* 表单 */
+.login-logo {
+  font-size: 56px;
+  margin-bottom: 12px;
+}
+
+.login-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 6px;
+}
+
+.login-subtitle {
+  font-size: 14px;
+  color: #999;
+  margin: 0;
+}
+
 .login-form {
-  :deep(.el-input__wrapper) {
-    border-radius: 10px;
-    padding: 4px 12px;
-    box-shadow: 0 0 0 1px #e5e7eb inset;
-    transition: all 0.3s;
-
-    &:hover {
-      box-shadow: 0 0 0 1px #c4b5fd inset;
-    }
-
-    &.is-focus {
-      box-shadow: 0 0 0 2px #667eea inset;
-    }
-  }
-
-  :deep(.el-input__prefix .el-icon) {
-    color: #9ca3af;
-    font-size: 18px;
-  }
-
-  :deep(.el-form-item) {
-    margin-bottom: 24px;
-  }
-
-  :deep(.el-form-item__error) {
-    padding-top: 4px;
-    font-size: 12px;
-  }
+  padding: 12px 0;
 }
 
-/* 登录按钮 */
-.login-btn {
-  width: 100%;
-  height: 46px;
-  border-radius: 10px;
-  font-size: 16px;
-  font-weight: 600;
-  letter-spacing: 6px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border: none;
-  transition: all 0.3s;
-
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-}
-
-/* 底部 */
-.login-footer {
-  text-align: center;
-  margin-top: 24px;
-  padding-top: 20px;
+.login-tips {
+  padding: 16px 20px 24px;
+  background: #f8f9fb;
   border-top: 1px solid #f0f0f0;
-
-  span {
-    font-size: 12px;
-    color: #b0b0b0;
-  }
 }
 
-/* 响应式 */
-@media (max-width: 480px) {
-  .login-card {
-    width: calc(100vw - 32px);
-    padding: 36px 24px 28px;
-    border-radius: 16px;
-  }
+.tips-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+  margin: 0 0 12px;
+}
+
+.tips-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.tip-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.15s;
+}
+
+.tip-item:hover {
+  border-color: #667eea;
+  background: #f0f0ff;
+}
+
+.tip-role {
+  color: #999;
+  font-size: 12px;
+}
+
+.tip-user {
+  color: #333;
+  font-weight: 600;
+}
+
+.tips-pwd {
+  font-size: 12px;
+  color: #aaa;
+  margin: 0;
+  text-align: center;
+}
+
+.van-cell-group--inset {
+  margin: 0 16px;
 }
 </style>
