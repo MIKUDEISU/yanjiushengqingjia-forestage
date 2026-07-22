@@ -1,12 +1,14 @@
 <template>
   <div class="login-page">
     <div class="login-card">
+      <!-- 头部 -->
       <div class="login-header">
         <div class="login-logo">🎓</div>
-        <h1 class="login-title">研究生请假管理系统</h1>
-        <p class="login-subtitle">武汉大学研究生院</p>
+        <h1 class="login-title">研究生请假系统</h1>
+        <p class="login-subtitle">武汉大学</p>
       </div>
 
+      <!-- 表单 -->
       <van-form @submit="handleLogin" class="login-form">
         <van-cell-group inset>
           <van-field
@@ -44,6 +46,7 @@
         </div>
       </van-form>
 
+      <!-- 提示 -->
       <div class="login-tips">
         <p class="tips-title">🔑 测试账号</p>
         <div class="tips-grid">
@@ -74,11 +77,11 @@ const form = reactive({
 })
 
 const testAccounts = [
-  { role: '学生', user: 'student1' },
-  { role: '导师', user: 'tutor1' },
-  { role: '辅导员', user: 'counselor1' },
-  { role: '院领导', user: 'college_leader1' },
-  { role: '管理员', user: 'admin1' }
+  { role: '学生', user: 'zhangsan' },
+  { role: '导师', user: 'daoshi01' },
+  { role: '辅导员', user: 'fudaoyuan01' },
+  { role: '院领导', user: 'lingdao01' },
+  { role: '管理员', user: 'admin' }
 ]
 
 function quickFill(acc) {
@@ -92,8 +95,13 @@ async function handleLogin() {
     const result = await authStore.login(form.username, form.password)
     if (result.success) {
       showToast({ message: '登录成功', icon: 'success', duration: 1000 })
+      // 根据角色跳转
       setTimeout(() => {
-        router.push('/student/init')
+        if (authStore.isStudent) {
+          router.push('/student/init')
+        } else {
+          router.push('/admin/list')
+        }
       }, 500)
     } else {
       showToast({ message: result.message || '登录失败', icon: 'fail' })
@@ -118,7 +126,7 @@ async function handleLogin() {
 
 .login-card {
   width: 100%;
-  max-width: 440px;
+  max-width: 400px;
   background: #fff;
   border-radius: 16px;
   overflow: hidden;
@@ -136,14 +144,14 @@ async function handleLogin() {
 }
 
 .login-title {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 700;
   color: #1a1a2e;
   margin: 0 0 4px;
 }
 
 .login-subtitle {
-  font-size: 14px;
+  font-size: 13px;
   color: #999;
   margin: 0;
 }

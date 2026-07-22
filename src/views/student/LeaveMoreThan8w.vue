@@ -1,7 +1,7 @@
 <template>
   <div class="page-container">
     <header class="view-header">
-      <h1>请假确认（>8周 / 特殊审批）</h1>
+      <h1>请假确认（＞8周）</h1>
     </header>
 
     <div class="confirm-page">

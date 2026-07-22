@@ -148,6 +148,17 @@ export const useLeaveStore = defineStore('leave', () => {
     return leaves.value.filter(l => l.status === 'approved' || l.status === 'rejected')
   })
 
+  function isPendingApproval(leave) {
+    if (leave.status === 'pending' || leave.status === 'processing') return true
+    if (leave.status === 'approved') {
+      if (leave.stage === 'return' && leave.returnStatus === 'processing') return true
+      if (leave.stage === 'delay' && leave.delayStatus === 'processing') return true
+      if (leave.type === 'return' && leave.status === 'pending') return true
+      if (leave.type === 'delay' && leave.status === 'pending') return true
+    }
+    return false
+  }
+
   async function fetchLeaves(params = {}) {
     loading.value = true
     try {
@@ -224,11 +235,134 @@ export const useLeaveStore = defineStore('leave', () => {
     }
   }
 
+  async function fetchApprovalList(params = {}) {
+    loading.value = true
+    try {
+      const res = await api.get('/admin/approvals', params)
+      if (res.code === 200) {
+        const list = (res.data.list || res.data || []).map(mapLeaveFromAPI)
+        leaves.value = list
+        total.value = res.data.total || list.length
+        return { success: true, data: res.data, list }
+      }
+      return { success: false, message: res.message }
+    } catch (err) {
+      return { success: false, message: err.message }
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function fetchApprovalsByType(type, params = {}) {
+    try {
+      const res = await api.get('/admin/approvals', { ...params, type })
+      if (res.code === 200) {
+        const list = (res.data.list || res.data || []).map(mapLeaveFromAPI)
+        return { success: true, list, total: res.data.total || list.length }
+      }
+      return { success: false, message: res.message, list: [] }
+    } catch (err) {
+      return { success: false, message: err.message, list: [] }
+    }
+  }
+
+  async function fetchApprovalDetail(type, id) {
+    try {
+      const res = await api.get(`/admin/approvals/${type}/${id}`)
+      if (res.code === 200) {
+        const detail = mapLeaveFromAPI(res.data)
+        detailCache.value[id] = detail
+        return { success: true, data: detail }
+      }
+      return { success: false, message: res.message }
+    } catch (err) {
+      return { success: false, message: err.message }
+    }
+  }
+
+  async function processApproval(type, id, action, comment = '') {
+    try {
+      const body = { action }
+      if (comment) body.comment = comment
+      const res = await api.post(`/admin/approvals/${type}/${id}/process`, body)
+      if (res.code === 200) {
+        const detail = mapLeaveFromAPI(res.data)
+        detailCache.value[id] = detail
+        const idx = leaves.value.findIndex(l => l.id === id)
+        if (idx !== -1) leaves.value[idx] = detail
+        return { success: true, data: detail }
+      }
+      return { success: false, message: res.message }
+    } catch (err) {
+      return { success: false, message: err.message }
+    }
+  }
+
+  async function approveLeave(id, comment = '') {
+    return processApproval('leave', id, 'approve', comment)
+  }
+
+  async function rejectLeave(id, comment = '') {
+    return processApproval('leave', id, 'reject', comment)
+  }
+
+  async function returnBackLeave(id, comment = '') {
+    return processApproval('leave', id, 'reject_back', comment)
+  }
+
+  async function applyReturn(leaveId) {
+    try {
+      const res = await api.post('/student/return', { leave_id: leaveId })
+      if (res.code === 201 || res.code === 200) {
+        return { success: true, data: res.data }
+      }
+      return { success: false, message: res.message }
+    } catch (err) {
+      return { success: false, message: err.message }
+    }
+  }
+
+  async function approveReturn(id) {
+    return processApproval('return', id, 'approve')
+  }
+
+  async function rejectReturn(id, comment = '') {
+    return processApproval('return', id, 'reject', comment)
+  }
+
+  async function applyDelay(leaveId, delayDays, delayReason) {
+    try {
+      const res = await api.post('/student/delay', {
+        leave_id: leaveId,
+        delay_days: delayDays,
+        delay_reason: delayReason
+      })
+      if (res.code === 201 || res.code === 200) {
+        return { success: true, data: res.data }
+      }
+      return { success: false, message: res.message }
+    } catch (err) {
+      return { success: false, message: err.message }
+    }
+  }
+
+  async function approveDelay(id) {
+    return processApproval('delay', id, 'approve')
+  }
+
+  async function rejectDelay(id, comment = '') {
+    return processApproval('delay', id, 'reject', comment)
+  }
+
   return {
     leaves, total, page, pageSize, loading, detailCache,
     allLeaves, pendingLeaves, completedLeaves,
-    getLeaveById,
+    isPendingApproval, getLeaveById,
     fetchLeaves, fetchPendingLeaves, fetchLeaveDetail,
-    submitLeave
+    fetchApprovalList, fetchApprovalsByType, fetchApprovalDetail,
+    submitLeave,
+    approveLeave, rejectLeave, returnBackLeave, processApproval,
+    applyReturn, approveReturn, rejectReturn,
+    applyDelay, approveDelay, rejectDelay
   }
 })

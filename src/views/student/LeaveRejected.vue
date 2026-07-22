@@ -5,6 +5,7 @@
     </header>
 
     <div class="rejected-page" v-if="leave">
+      <!-- 拒绝横幅 -->
       <div class="status-banner status-banner--error">
         <div class="status-banner__icon"></div>
         <div class="status-banner__text">
@@ -13,6 +14,7 @@
         </div>
       </div>
 
+      <!-- 拒绝原因 -->
       <div class="content-card">
         <div class="section-title">拒绝原因</div>
         <div class="reason-box">
@@ -21,6 +23,7 @@
         </div>
       </div>
 
+      <!-- 原请假信息 -->
       <div class="content-card">
         <div class="section-title">原始请假信息</div>
         <div class="info-row">
@@ -41,6 +44,7 @@
         </div>
       </div>
 
+      <!-- 审批时间轴 -->
       <div class="content-card">
         <div class="section-title">审批记录</div>
         <div class="timeline">
@@ -55,6 +59,7 @@
         </div>
       </div>
 
+      <!-- 操作 -->
       <div class="action-bar">
         <van-button round block type="primary" @click="resubmit">
           修改并重新提交

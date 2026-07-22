@@ -1,16 +1,18 @@
 <template>
   <div class="page-container">
     <header class="view-header">
-      <h1>请假确认（<2周）</h1>
+      <h1>请假确认（＜2周）</h1>
     </header>
 
     <div class="confirm-page">
+      <!-- 流程说明卡片 -->
       <div class="flow-card">
         <div class="flow-card__icon"></div>
         <div class="flow-card__title">简易审批流程</div>
         <div class="flow-card__desc">请假时长小于2周，仅需 <strong>辅导员一级审批</strong> 即可</div>
       </div>
 
+      <!-- 待审批人信息 -->
       <div class="content-card">
         <div class="section-title">审批流程</div>
         <van-steps :active="0" direction="vertical">
@@ -28,6 +30,7 @@
         </van-steps>
       </div>
 
+      <!-- 提示 -->
       <div class="content-card">
         <div class="warning-box">
           <van-icon name="info-o" color="#F59E0B" size="18" />
@@ -37,6 +40,7 @@
         </div>
       </div>
 
+      <!-- 操作 -->
       <div class="action-bar">
         <van-button round block type="primary" @click="confirmSubmit" :loading="loading">
           确认提交申请

@@ -5,6 +5,7 @@
     </header>
 
     <div class="leave-init">
+      <!-- 步骤条 -->
       <div class="steps-header">
         <div class="step-item active">
           <div class="step-circle">1</div>
@@ -22,6 +23,7 @@
         </div>
       </div>
 
+      <!-- 表单 -->
       <van-form @submit="onSubmit" scroll-to-error>
         <van-cell-group inset title="基本信息">
           <van-field
@@ -137,11 +139,13 @@
             placeholder="请输入详细地址（如街道门牌号）"
             maxlength="100"
           />
+          <!-- 添加更多目的地按钮 -->
           <div v-if="form.leavingXiAn && destinations.length < 3" class="add-dest-wrap">
             <van-button size="small" type="primary" plain @click="addDestination">
               + 添加目的地
             </van-button>
           </div>
+          <!-- 已添加的额外目的地 -->
           <div v-for="(dest, idx) in destinations" :key="idx" class="extra-destination">
             <div class="dest-header">
               <span>目的地 {{ idx + 2 }}</span>
@@ -225,6 +229,7 @@
         </div>
       </van-form>
 
+      <!-- Picker 弹窗 -->
       <van-popup v-model:show="showTypePicker" position="bottom" round>
         <van-picker
           :columns="leaveTypeColumns"
@@ -308,9 +313,11 @@ const form = reactive({
   attachments: []
 })
 
+// 额外的目的地列表
 const destinations = ref([])
 const editingDestIndex = ref(-1)
 
+// 自动填充当前用户信息
 onMounted(() => {
   if (authStore.isLoggedIn && authStore.isStudent) {
     form.studentName = authStore.userName
@@ -420,6 +427,7 @@ function onFinishDestination({ selectedOptions }) {
   destinationText.value = names.join('')
   form.destination = names.join('')
 
+  // 解析省/市/区
   const [province, city, district] = names
   if (editingDestIndex.value >= 0) {
     const dest = destinations.value[editingDestIndex.value]

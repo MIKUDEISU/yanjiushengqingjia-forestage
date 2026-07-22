@@ -6,6 +6,7 @@
 
     <div class="history-page">
       <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
+        <!-- 统计条 -->
         <div class="stat-strip" v-if="leaves.length">
           <div class="stat-chip">
             <span class="stat-chip__num">{{ leaves.length }}</span>
@@ -25,6 +26,7 @@
           </div>
         </div>
 
+        <!-- 列表 -->
         <div v-if="leaves.length">
           <div
             v-for="leave in leaves"
@@ -78,6 +80,7 @@ const leaveStore = useLeaveStore()
 const loading = ref(false)
 const refreshing = ref(false)
 
+// Fetch data on mount
 onMounted(async () => {
   await loadData()
 })
@@ -137,7 +140,17 @@ function goToLeave(leave) {
   } else if (leave.status === 'rejected') {
     router.push(`/student/leave/${leave.id}/rejected`)
   } else if (leave.status === 'approved') {
-    router.push(`/student/leave/${leave.id}/processing`)
+    if (leave.stage === 'return') {
+      if (leave.returnStatus === 'processing') router.push(`/student/leave/${leave.id}/return/processing`)
+      else if (leave.returnStatus === 'approved') router.push(`/student/leave/${leave.id}/return/approved`)
+      else if (leave.returnStatus === 'rejected') router.push(`/student/leave/${leave.id}/return/rejected`)
+    } else if (leave.stage === 'delay') {
+      if (leave.delayStatus === 'processing') router.push(`/student/leave/${leave.id}/delay/processing`)
+      else if (leave.delayStatus === 'approved') router.push(`/student/leave/${leave.id}/delay/approved`)
+      else if (leave.delayStatus === 'rejected') router.push(`/student/leave/${leave.id}/delay/rejected`)
+    } else {
+      router.push(`/student/leave/${leave.id}/processing`)
+    }
   }
 }
 </script>
