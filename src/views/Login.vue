@@ -3,8 +3,8 @@
     <div class="login-card">
       <div class="login-header">
         <div class="login-logo">🎓</div>
-        <h1 class="login-title">研究生请假系统</h1>
-        <p class="login-subtitle">武汉大学</p>
+        <h1 class="login-title">研究生请假管理系统</h1>
+        <p class="login-subtitle">武汉大学研究生院</p>
       </div>
 
       <van-form @submit="handleLogin" class="login-form">
@@ -93,7 +93,7 @@ async function handleLogin() {
     if (result.success) {
       showToast({ message: '登录成功', icon: 'success', duration: 1000 })
       setTimeout(() => {
-        router.push('/')
+        router.push('/student/init')
       }, 500)
     } else {
       showToast({ message: result.message || '登录失败', icon: 'fail' })
@@ -118,7 +118,7 @@ async function handleLogin() {
 
 .login-card {
   width: 100%;
-  max-width: 420px;
+  max-width: 440px;
   background: #fff;
   border-radius: 16px;
   overflow: hidden;
@@ -127,19 +127,19 @@ async function handleLogin() {
 
 .login-header {
   text-align: center;
-  padding: 40px 32px 24px;
+  padding: 32px 20px 20px;
 }
 
 .login-logo {
-  font-size: 56px;
-  margin-bottom: 12px;
+  font-size: 48px;
+  margin-bottom: 8px;
 }
 
 .login-title {
   font-size: 24px;
   font-weight: 700;
   color: #1a1a2e;
-  margin: 0 0 6px;
+  margin: 0 0 4px;
 }
 
 .login-subtitle {
@@ -149,39 +149,39 @@ async function handleLogin() {
 }
 
 .login-form {
-  padding: 12px 0;
+  padding: 8px 0;
 }
 
 .login-tips {
-  padding: 16px 20px 24px;
+  padding: 12px 16px 20px;
   background: #f8f9fb;
   border-top: 1px solid #f0f0f0;
 }
 
 .tips-title {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: #666;
-  margin: 0 0 12px;
+  margin: 0 0 10px;
 }
 
 .tips-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .tip-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 14px;
+  gap: 6px;
+  padding: 6px 10px;
   background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 12px;
   transition: all 0.15s;
 }
 
@@ -192,7 +192,7 @@ async function handleLogin() {
 
 .tip-role {
   color: #999;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .tip-user {
@@ -201,7 +201,7 @@ async function handleLogin() {
 }
 
 .tips-pwd {
-  font-size: 12px;
+  font-size: 11px;
   color: #aaa;
   margin: 0;
   text-align: center;

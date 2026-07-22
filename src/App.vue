@@ -1,6 +1,9 @@
 <template>
   <div id="app-root">
-    <div class="app-body" v-if="!isLoginPage && authStore.isLoggedIn">
+    <div v-if="isLoginPage" class="login-wrapper">
+      <router-view />
+    </div>
+    <div v-else class="app-body">
       <aside class="sidebar">
         <div class="sidebar__brand">
           <div class="sidebar__logo">🎓</div>
@@ -8,7 +11,13 @@
         </div>
 
         <nav class="sidebar__nav">
-          <!-- Phase 1: No routes available yet — nav links added in Phase 2 -->
+          <div class="sidebar__group">学生功能</div>
+          <router-link to="/student/init" class="nav-item" active-class="nav-item--active">
+            <span>📝 发起请假</span>
+          </router-link>
+          <router-link to="/student/history" class="nav-item" active-class="nav-item--active">
+            <span>📋 请假记录</span>
+          </router-link>
         </nav>
 
         <div class="sidebar__footer">
@@ -31,9 +40,6 @@
         </router-view>
       </main>
     </div>
-    <div v-else class="login-wrapper">
-      <router-view />
-    </div>
   </div>
 </template>
 
@@ -46,6 +52,8 @@ const route = useRoute()
 const authStore = useAuthStore()
 
 const isLoginPage = computed(() => route.name === 'Login')
+const isStudent = computed(() => authStore.isStudent)
+const isAdmin = computed(() => authStore.isAdmin)
 const userName = computed(() => authStore.userName)
 const roleName = computed(() => authStore.roleName)
 
@@ -64,12 +72,12 @@ onMounted(() => {
   overflow: hidden;
 }
 
-.app-body {
-  display: flex;
+.login-wrapper {
   height: 100vh;
 }
 
-.login-wrapper {
+.app-body {
+  display: flex;
   height: 100vh;
 }
 
@@ -98,17 +106,49 @@ onMounted(() => {
 }
 
 .sidebar__title {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   letter-spacing: 0.5px;
 }
 
+.sidebar__group {
+  padding: 16px 14px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.4);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
 .sidebar__nav {
   flex: 1;
-  padding: 12px;
+  padding: 4px 12px 12px;
   display: flex;
   flex-direction: column;
   gap: 2px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border-radius: 8px;
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.15s;
+}
+
+.nav-item:hover {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+}
+
+.nav-item--active {
+  background: rgba(255,255,255,0.18) !important;
+  color: #fff !important;
+  font-weight: 600;
 }
 
 .sidebar__footer {
@@ -133,15 +173,20 @@ onMounted(() => {
   justify-content: center;
   font-size: 16px;
   font-weight: 700;
+  flex-shrink: 0;
 }
 
 .sidebar__user-info {
   flex: 1;
+  min-width: 0;
 }
 
 .sidebar__user-name {
   font-size: 14px;
   font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .sidebar__user-role {
@@ -163,15 +208,15 @@ onMounted(() => {
 }
 
 .sidebar__logout:hover {
-  background: rgba(255,255,255,0.1);
-  color: #fff;
+  background: rgba(239,68,68,0.2);
+  border-color: rgba(239,68,68,0.4);
+  color: #f87171;
 }
 
 .main-content {
   flex: 1;
   overflow-y: auto;
   background: #f0f4f8;
-  padding: 0;
 }
 
 .page-fade-enter-active,
