@@ -35,7 +35,14 @@ async function request(url, options = {}) {
 
   try {
     const response = await fetch(`${BASE_URL}${url}`, config)
-    const data = await response.json()
+
+    let data = null
+    try {
+      const text = await response.text()
+      data = text ? JSON.parse(text) : {}
+    } catch {
+      data = {}
+    }
 
     if (response.status === 401) {
       removeToken()
