@@ -74,11 +74,11 @@ const form = reactive({
 })
 
 const testAccounts = [
-  { role: '学生', user: 'student1' },
-  { role: '导师', user: 'tutor1' },
-  { role: '辅导员', user: 'counselor1' },
-  { role: '院领导', user: 'college_leader1' },
-  { role: '管理员', user: 'admin1' }
+  { role: '学生', user: 'zhangsan' },
+  { role: '导师', user: 'daoshi01' },
+  { role: '辅导员', user: 'fudaoyuan01' },
+  { role: '院领导', user: 'lingdao01' },
+  { role: '管理员', user: 'admin' }
 ]
 
 function quickFill(acc) {
