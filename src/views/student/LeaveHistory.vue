@@ -1,12 +1,9 @@
 <template>
   <div class="page-container">
-    <header class="view-header">
-      <h1>请假记录</h1>
-    </header>
+    <header class="view-header"><h1>请假记录</h1></header>
 
     <div class="history-page">
       <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
-        <!-- 统计条 -->
         <div class="stat-strip" v-if="leaves.length">
           <div class="stat-chip">
             <span class="stat-chip__num">{{ leaves.length }}</span>
@@ -26,7 +23,6 @@
           </div>
         </div>
 
-        <!-- 列表 -->
         <div v-if="leaves.length">
           <div
             v-for="leave in leaves"
@@ -80,7 +76,6 @@ const leaveStore = useLeaveStore()
 const loading = ref(false)
 const refreshing = ref(false)
 
-// Fetch data on mount
 onMounted(async () => {
   await loadData()
 })

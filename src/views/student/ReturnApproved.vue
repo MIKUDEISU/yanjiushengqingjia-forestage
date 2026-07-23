@@ -1,8 +1,6 @@
 <template>
   <div class="page-container">
-    <header class="view-header">
-      <h1>返校通过</h1>
-    </header>
+    <header class="view-header"><h1>返校凭证</h1></header>
 
     <div class="page-content" v-if="leave">
       <div class="success-banner">

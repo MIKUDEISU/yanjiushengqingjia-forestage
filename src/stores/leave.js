@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { api } from '@/api/index.js'
+import { useAuthStore } from '@/stores/auth.js'
 
 function calcDuration(startDate, endDate) {
   const start = new Date(startDate)
@@ -9,6 +10,7 @@ function calcDuration(startDate, endDate) {
 }
 
 function buildTimeline(item) {
+  // 1. 优先使用 approvals 数组（审批详情接口返回）
   if (item.approvals && Array.isArray(item.approvals) && item.approvals.length > 0) {
     return item.approvals.map(r => ({
       time: r.created_at || '',
@@ -20,8 +22,10 @@ function buildTimeline(item) {
     }))
   }
 
+  // 2. 尝试 approval_timeline 字段（可能是 JSON 字符串或已解析的数组）
   if (item.approval_timeline) {
     let timeline = item.approval_timeline
+    // 如果是字符串，尝试 JSON 解析
     if (typeof timeline === 'string') {
       try {
         timeline = JSON.parse(timeline)
@@ -29,6 +33,7 @@ function buildTimeline(item) {
         return []
       }
     }
+    // 如果解析后是数组
     if (Array.isArray(timeline) && timeline.length > 0) {
       return timeline.map(t => ({
         time: t.time || t.created_at || '',
@@ -39,17 +44,20 @@ function buildTimeline(item) {
     }
   }
 
+  // 3. 没有时间轴数据
   return []
 }
 
 function buildDestinations(leaveData) {
   const dests = []
+  // 主目的地
   if (leaveData.destination) {
     dests.push({
       city: leaveData.destination,
       address: leaveData.destinationDetail || ''
     })
   }
+  // 额外目的地
   if (leaveData.extraDestinations && Array.isArray(leaveData.extraDestinations)) {
     for (const d of leaveData.extraDestinations) {
       if (d.text) {
@@ -68,6 +76,8 @@ function buildDestinations(leaveData) {
 function mapLeaveFromAPI(item) {
   if (!item) return null
 
+  // 判断当前阶段 (stage)
+  // type 字段来自审批列表API (leave/return/delay/overdue)
   let stage = 'initial'
   let returnStatus = item.return_status || null
   let delayStatus = null
@@ -80,6 +90,7 @@ function mapLeaveFromAPI(item) {
     delayStatus = item.delay_status || item.status || 'pending'
   }
 
+  // 解析目的地
   let dests = item.destinations
   if (typeof dests === 'string') {
     try { dests = JSON.parse(dests) } catch { dests = [] }
@@ -354,6 +365,18 @@ export const useLeaveStore = defineStore('leave', () => {
     return processApproval('delay', id, 'reject', comment)
   }
 
+  async function fetchStatistics() {
+    try {
+      const res = await api.get('/statistics/overview')
+      if (res.code === 200) {
+        return { success: true, data: res.data }
+      }
+      return { success: false, message: res.message }
+    } catch (err) {
+      return { success: false, message: err.message }
+    }
+  }
+
   return {
     leaves, total, page, pageSize, loading, detailCache,
     allLeaves, pendingLeaves, completedLeaves,
@@ -363,6 +386,7 @@ export const useLeaveStore = defineStore('leave', () => {
     submitLeave,
     approveLeave, rejectLeave, returnBackLeave, processApproval,
     applyReturn, approveReturn, rejectReturn,
-    applyDelay, approveDelay, rejectDelay
+    applyDelay, approveDelay, rejectDelay,
+    fetchStatistics
   }
 })

@@ -1,8 +1,6 @@
 <template>
   <div class="page-container">
-    <header class="view-header">
-      <h1>请假确认（2-4周）</h1>
-    </header>
+    <header class="view-header"><h1>请假确认（2-4周）</h1></header>
 
     <div class="confirm-page">
       <div class="flow-card flow-card--secondary">

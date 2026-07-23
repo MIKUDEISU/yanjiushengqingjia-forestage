@@ -297,6 +297,21 @@ html, body {
   margin-bottom: 16px;
 }
 
+.view-header {
+  background: #fff;
+  padding: 16px 24px;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.view-header h1 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
 @media (min-width: 768px) {
   html, body {
     font-size: 15px;
@@ -354,19 +369,4 @@ html, body {
   .stat-card__value {
     font-size: 28px;
   }
-}
-
-.view-header {
-  background: #fff;
-  padding: 16px 24px;
-  border-bottom: 1px solid #e5e7eb;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-.view-header h1 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #1a1a2e;
 }

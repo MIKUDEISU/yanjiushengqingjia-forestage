@@ -20,7 +20,9 @@ import DelayProcessing from '@/views/student/DelayProcessing.vue'
 
 import AdminApprovalList from '@/views/admin/AdminApprovalList.vue'
 import AdminApprovalDetail from '@/views/admin/AdminApprovalDetail.vue'
+import DataStatistics from '@/views/admin/DataStatistics.vue'
 import RoleSwitch from '@/views/admin/RoleSwitch.vue'
+import ApprovalHistory from '@/views/admin/ApprovalHistory.vue'
 
 const routes = [
   {
@@ -55,7 +57,8 @@ const routes = [
   { path: '/student/leave/:id/delay/processing', name: 'DelayProcessing', component: DelayProcessing, props: true, meta: { role: 'student' } },
   { path: '/admin/list', name: 'AdminApprovalList', component: AdminApprovalList, meta: { role: 'admin' } },
   { path: '/admin/detail/:id', name: 'AdminApprovalDetail', component: AdminApprovalDetail, props: true, meta: { role: 'admin' } },
-  { path: '/admin/history', name: 'ApprovalHistory', component: AdminApprovalList, meta: { role: 'admin' } },
+  { path: '/admin/statistics', name: 'DataStatistics', component: DataStatistics, meta: { role: 'admin' } },
+  { path: '/admin/history', name: 'ApprovalHistory', component: ApprovalHistory, meta: { role: 'admin' } },
   { path: '/role-switch', name: 'RoleSwitch', component: RoleSwitch }
 ]
 

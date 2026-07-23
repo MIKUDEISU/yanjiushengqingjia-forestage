@@ -1,8 +1,6 @@
 <template>
   <div class="page-container">
-    <header class="view-header">
-      <h1>角色切换</h1>
-    </header>
+    <header class="view-header"><h1>角色切换</h1></header>
 
     <div class="role-page">
       <div class="role-banner">
@@ -22,7 +20,6 @@
         </van-cell-group>
       </div>
 
-      <!-- 退出登录 -->
       <div class="content-card">
         <van-button round block type="danger" @click="handleLogout">
           <van-icon name="revoke" /> 退出登录

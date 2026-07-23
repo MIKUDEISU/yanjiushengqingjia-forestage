@@ -1,11 +1,8 @@
 <template>
   <div class="page-container">
-    <header class="view-header">
-      <h1>返校申请</h1>
-    </header>
+    <header class="view-header"><h1>返校申请</h1></header>
 
     <div class="return-page">
-      <!-- 空状态：没有需要返校的请假 -->
       <div v-if="!loading && approvedLeaves.length === 0" class="empty-state">
         <van-empty image="search" description="暂无需返校的请假记录">
           <template #bottom>
@@ -17,12 +14,10 @@
         </van-empty>
       </div>
 
-      <!-- 加载中 -->
       <div v-if="loading" class="loading-wrap">
         <van-loading size="32" vertical>加载中...</van-loading>
       </div>
 
-      <!-- 可申请返校的请假列表 -->
       <div v-if="!loading && approvedLeaves.length > 0" class="leave-list">
         <div class="section-title">请选择需要返校的请假记录</div>
         <div
@@ -49,7 +44,6 @@
           <div v-if="leave.returnStatus === 'pending'" class="leave-card__pending">
             <van-tag type="primary">返校审批中</van-tag>
           </div>
-          <!-- 选中后显示详情 -->
           <div v-if="selectedLeave?.id === leave.id" class="leave-card__detail">
             <van-divider />
             <div class="detail-row">
@@ -100,7 +94,6 @@
         </div>
       </div>
 
-      <!-- 返校申请结果弹窗 -->
       <van-dialog
         v-model:show="showResult"
         :title="resultSuccess ? '提交成功' : '提交失败'"
@@ -128,7 +121,6 @@ const showResult = ref(false)
 const resultSuccess = ref(false)
 const resultMessage = ref('')
 
-// 只显示审批通过且需要返校的请假记录
 const approvedLeaves = computed(() => {
   return leaveStore.leaves.filter(l => {
     // 审批通过的请假

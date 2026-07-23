@@ -1,11 +1,8 @@
 <template>
   <div class="page-container">
-    <header class="view-header">
-      <h1>审批列表</h1>
-    </header>
+    <header class="view-header"><h1>审批列表</h1></header>
 
     <div class="list-page">
-      <!-- 统计条 -->
       <div class="stat-strip">
         <div class="stat-chip stat-chip--active">
           <span class="stat-chip__num">{{ pendingLeaves.length }}</span>
@@ -18,7 +15,6 @@
       </div>
 
       <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
-        <!-- Tab 切换 -->
         <van-tabs v-model:active="activeTab" sticky @change="onTabChange">
           <van-tab title="请假审批" name="leave">
             <div class="tab-content">
@@ -199,7 +195,6 @@ const searchText = ref('')
 const loading = ref(false)
 const refreshing = ref(false)
 
-// 分类型数据
 const leaveApprovals = ref([])
 const returnApprovals = ref([])
 const overdueApprovals = ref([])
@@ -211,7 +206,6 @@ onMounted(async () => {
 async function loadData() {
   loading.value = true
   try {
-    // 分别加载三类审批数据
     const [leaveRes, returnRes, overdueRes] = await Promise.all([
       leaveStore.fetchApprovalsByType('leave', { page_size: 200 }),
       leaveStore.fetchApprovalsByType('return', { page_size: 200 }),
@@ -236,7 +230,6 @@ function onTabChange(name) {
   if (name === 'leave') loadData()
 }
 
-// 请假审批条目（过滤非初始阶段的）
 const pendingLeaves = computed(() =>
   leaveApprovals.value
     .filter(l => l.status === 'pending' || l.status === 'processing')
@@ -258,12 +251,10 @@ const filteredLeaveItems = computed(() => {
   return list
 })
 
-// 返校审批条目
 const returnItems = computed(() =>
   returnApprovals.value.filter(l => l.status === 'pending')
 )
 
-// 超时未归条目
 const overdueItems = computed(() =>
   overdueApprovals.value.filter(l =>
     l.returnStatus === 'overdue' ||

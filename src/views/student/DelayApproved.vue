@@ -1,8 +1,6 @@
 <template>
   <div class="page-container">
-    <header class="view-header">
-      <h1>延期通过</h1>
-    </header>
+    <header class="view-header"><h1>延期确认</h1></header>
 
     <div class="page-content" v-if="leave">
       <div class="success-banner">

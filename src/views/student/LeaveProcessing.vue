@@ -1,11 +1,8 @@
 <template>
   <div class="page-container">
-    <header class="view-header">
-      <h1>审批进度</h1>
-    </header>
+    <header class="view-header"><h1>审批进度</h1></header>
 
     <div class="processing-page">
-      <!-- 状态横幅 — 根据 status 动态显示 -->
       <div class="status-banner" :class="bannerClass" v-if="leave">
         <div class="status-banner__icon">{{ bannerIcon }}</div>
         <div class="status-banner__text">
@@ -22,7 +19,6 @@
         </div>
       </div>
 
-      <!-- 进度条 — 仅 processing/pending 显示 -->
       <div class="content-card" v-if="leave && (leave.status === 'pending' || leave.status === 'processing')">
         <div class="section-title">审批进度</div>
         <div class="progress-wrapper">
@@ -38,7 +34,6 @@
         </div>
       </div>
 
-      <!-- 时间轴 -->
       <div class="content-card">
         <div class="section-title">审批时间轴</div>
         <div class="timeline">
@@ -58,7 +53,6 @@
         </div>
       </div>
 
-      <!-- 请假摘要 -->
       <div class="content-card" v-if="leave">
         <div class="section-title">请假信息摘要</div>
         <div class="summary-grid">
@@ -91,9 +85,7 @@
         </div>
       </div>
 
-      <!-- 操作区 — 根据状态动态显示 -->
       <div class="action-bar" v-if="leave">
-        <!-- 已通过 + 初始阶段 → 返校/延期按钮 -->
         <template v-if="leave.status === 'approved' && leave.stage === 'initial'">
           <van-button round block type="primary" @click="handleApplyReturn" class="follow-btn">
             申请返校
@@ -103,7 +95,6 @@
           </van-button>
         </template>
 
-        <!-- 返校阶段 processing → 查看返校进度 -->
         <template v-else-if="leave.status === 'approved' && leave.stage === 'return'">
           <template v-if="leave.returnStatus === 'processing'">
             <div class="action-note">返校审批进行中，请耐心等待</div>
@@ -120,7 +111,6 @@
           </template>
         </template>
 
-        <!-- 延期阶段 -->
         <template v-else-if="leave.status === 'approved' && leave.stage === 'delay'">
           <template v-if="leave.delayStatus === 'processing'">
             <div class="action-note">延期审批进行中，请耐心等待</div>
@@ -137,7 +127,6 @@
           </template>
         </template>
 
-        <!-- 被拒绝 → 重新提交 -->
         <template v-else-if="leave.status === 'rejected'">
           <van-button round block type="primary" @click="$router.push(`/student/leave/${leave.id}/rejected`)">
             查看拒绝原因并重新提交
@@ -169,7 +158,6 @@ const leaveStore = useLeaveStore()
 const leaveId = computed(() => parseInt(route.params.id))
 const leave = computed(() => leaveStore.getLeaveById(leaveId.value))
 
-// ---------- 动态横幅 ----------
 const bannerClass = computed(() => {
   if (!leave.value) return ''
   switch (leave.value.status) {
@@ -220,7 +208,6 @@ const statusTagText = computed(() => {
   }
 })
 
-// ---------- 返校/延期操作 ----------
 function handleApplyReturn() {
   if (!leave.value) return
   leaveStore.applyReturn(leave.value.id)

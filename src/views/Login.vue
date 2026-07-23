@@ -1,14 +1,12 @@
 <template>
   <div class="login-page">
     <div class="login-card">
-      <!-- 头部 -->
       <div class="login-header">
         <div class="login-logo">🎓</div>
         <h1 class="login-title">研究生请假系统</h1>
         <p class="login-subtitle">武汉大学</p>
       </div>
 
-      <!-- 表单 -->
       <van-form @submit="handleLogin" class="login-form">
         <van-cell-group inset>
           <van-field
@@ -46,7 +44,6 @@
         </div>
       </van-form>
 
-      <!-- 提示 -->
       <div class="login-tips">
         <p class="tips-title">🔑 测试账号</p>
         <div class="tips-grid">
@@ -95,7 +92,6 @@ async function handleLogin() {
     const result = await authStore.login(form.username, form.password)
     if (result.success) {
       showToast({ message: '登录成功', icon: 'success', duration: 1000 })
-      // 根据角色跳转
       setTimeout(() => {
         if (authStore.isStudent) {
           router.push('/student/init')

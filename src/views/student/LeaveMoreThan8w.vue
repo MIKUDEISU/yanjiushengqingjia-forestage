@@ -1,8 +1,6 @@
 <template>
   <div class="page-container">
-    <header class="view-header">
-      <h1>请假确认（＞8周）</h1>
-    </header>
+    <header class="view-header"><h1>请假确认（＞8周）</h1></header>
 
     <div class="confirm-page">
       <div class="flow-card flow-card--special">
@@ -38,7 +36,6 @@
         </van-steps>
       </div>
 
-      <!-- 休学联动提醒 -->
       <div class="content-card">
         <div class="section-title">休学/复学联动提醒</div>
         <div class="alert-box">

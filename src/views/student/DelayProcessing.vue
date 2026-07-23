@@ -1,8 +1,6 @@
 <template>
   <div class="page-container">
-    <header class="view-header">
-      <h1>延期审批中</h1>
-    </header>
+    <header class="view-header"><h1>延期审批中</h1></header>
 
     <div class="page-content" v-if="leave">
       <div class="info-banner">

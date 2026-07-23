@@ -1,8 +1,10 @@
 function buildRegionTree() {
   try {
+    // 尝试使用 china-area-data (已安装在node_modules中)
     const areaData = require('china-area-data/v5/data.json')
     return buildOptions(areaData)
   } catch (e) {
+    // 降级：返回基本省份列表
     console.warn('无法加载china-area-data，使用降级数据:', e.message)
     return getFallbackRegions()
   }
@@ -10,8 +12,11 @@ function buildRegionTree() {
 
 function buildOptions(data) {
   const options = []
+  // china-area-data v5 格式: { "110000": "北京", "110100": "市辖区", ... }
+  // 需要解析层级关系
   for (const [code, name] of Object.entries(data)) {
     if (code.endsWith('0000') && code.length === 6) {
+      // 省份
       const cities = []
       for (const [cityCode, cityName] of Object.entries(data)) {
         if (cityCode.startsWith(code.substring(0, 2)) && cityCode.endsWith('00') && cityCode.length === 6 && cityCode !== code) {

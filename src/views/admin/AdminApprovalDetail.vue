@@ -1,13 +1,10 @@
 <template>
   <div class="page-container">
-    <header class="view-header">
-      <h1>审批详情</h1>
-    </header>
+    <header class="view-header"><h1>审批详情</h1></header>
 
     <van-loading v-if="loading" class="loading-center" size="24" text="加载中..." />
 
     <div class="detail-page" v-else-if="leave">
-      <!-- 学生信息区 -->
       <div class="student-card">
         <div class="student-card__avatar">{{ leave.studentName.charAt(0) }}</div>
         <div class="student-card__info">
@@ -17,7 +14,6 @@
         <div :class="'status-tag ' + statusClass">{{ statusText }}</div>
       </div>
 
-      <!-- 请假信息卡片 -->
       <div class="content-card">
         <div class="section-title">请假信息</div>
         <div class="info-row">
@@ -43,7 +39,6 @@
         <div class="reason-box">{{ leave.reason }}</div>
       </div>
 
-      <!-- 审批时间轴 -->
       <div class="content-card" v-if="leave.timeline && leave.timeline.length">
         <div class="section-title">审批流转记录</div>
         <div class="timeline">
@@ -58,7 +53,6 @@
         </div>
       </div>
 
-      <!-- 审批操作区 -->
       <div class="content-card" v-if="isPendingApproval(leave)">
         <div class="section-title">{{ approvalSectionTitle }}</div>
         <div class="sms-toggle">
@@ -93,7 +87,6 @@
         </div>
       </div>
 
-      <!-- 已处理结果 -->
       <div class="content-card" v-if="!isPendingApproval(leave)">
         <div class="section-title">审批结果</div>
         <div class="result-box" :class="resultBoxClass">
@@ -184,7 +177,6 @@ const rejectPlaceholder = computed(() => {
   return '请输入拒绝原因...'
 })
 
-// Status display helpers
 const statusClass = computed(() => {
   if (!leave.value) return ''
   if (leave.value.status === 'approved') {
@@ -256,7 +248,6 @@ const resultSubText = computed(() => {
   return ''
 })
 
-// Approval handlers
 async function handleApprove() {
   if (!leave.value) return
   submitting.value = true
